@@ -260,47 +260,81 @@ async function performAnalysis(inputSymbol, inputInterval) {
   const supports = [piv.S1, piv.S2, piv.S3].filter(Boolean).sort((a,b)=>a-b);
 
   // Build text
-  const lines = [];
-  lines.push('🔍 Genel Değerlendirme:');
-  lines.push(`- Güncel fiyat ${formatNumber(price)} civarında seyrediyor, fiyat şu an son swing hareketinin denge seviyesi üzerinde işlem görüyor.`);
-  lines.push(`- Son swing hareketinin high seviyesi ~${formatNumber(swingHigh)}, low seviyesi ise ~${formatNumber(swingLow)} civarı.`);
-  lines.push(`- Hacimlerde son 1 saatte alıcılar ${buyersPct.toFixed(0)}% oranında, satıcılar ${sellersPct.toFixed(0)}%.`);
-  lines.push(`- Genel trend ${trendBull ? 'bullish' : 'bearish/sideways'}, ana göstergeler ${trendBull ? 'alım' : 'zayıf'} sinyali üretiyor.`);
+  // Sort arrays for easier access
+  // Supports (ascending): S3, S2, S1
+  // Resistances (descending): R3, R2, R1
+  
+  const s1 = supports.length >= 3 ? supports[2] : supports[supports.length - 1];
+  const s2 = supports.length >= 3 ? supports[1] : (supports.length > 1 ? supports[0] : s1 * 0.98);
+  const s3 = supports.length >= 3 ? supports[0] : s2 * 0.98;
 
-  lines.push('\n📉 Teknik Göstergeler:\n');
-  lines.push(`- MACD ${macdNow >= macdSignal ? 'bullish' : 'bearish'} (MACD: ${formatNumber(macdNow)}, Sinyal: ${formatNumber(macdSignal)})`);
-  lines.push(`- RSI(14): ${formatNumber(rsiNow)} ${rsiNow >= 55 ? '(bullish)' : rsiNow <= 45 ? '(bearish)' : '(nötr)'}`);
-  lines.push(`- Stochastic %K: ${formatNumber(stochNow)} ${stochNow >= 55 ? '(bullish)' : stochNow <= 45 ? '(bearish)' : '(nötr)'}`);
-  lines.push(`- Momentum(10): ${formatNumber(momNow)}%`);
-  lines.push(`- ATR(14): ${formatNumber(atrNow)} (volatilite ${atrNow/price > 0.005 ? 'yüksek' : 'orta/düşük'})`);
+  const r1 = resistances.length >= 3 ? resistances[2] : resistances[resistances.length - 1];
+  const r2 = resistances.length >= 3 ? resistances[1] : (resistances.length > 1 ? resistances[0] : r1 * 1.02);
+  const r3 = resistances.length >= 3 ? resistances[0] : r2 * 1.02;
 
-  lines.push('\n📈 Kritik Seviyeler:\n');
-  if (resistances.length > 0) {
-    lines.push(`- ${resistances.map(v => formatNumber(v)).join(', ')} bölgeleri fiyatın üstünde direnç/supply alanları.`);
-  }
-  if (supports.length > 0) {
-    lines.push(`- ${supports.map(v => formatNumber(v)).join(', ')} seviyeleri fiyatın hemen altında önemli demand bölgeleri.`);
-  }
-  if (supports.length > 2) {
-    lines.push(`- ${formatNumber(supports[0])} ise daha aşağılarda major demand seviyesi.`);
-  }
+  const displaySymbol = symbol.replace('USDT', '');
+  
+  // Determine momentum string
+  let momentumStr = "Nötr";
+  if (momNow > 2) momentumStr = "Güçlü";
+  else if (momNow > 0.5) momentumStr = "Orta–Güçlü";
+  else if (momNow < -2) momentumStr = "Zayıf";
+  else if (momNow < -0.5) momentumStr = "Orta–Zayıf";
 
-  lines.push('\n🌌 Alexanın Beklentisi:\n');
+  // Generate strings based on trend
+  let outlook = "";
+  let expectation = "";
+  let shortTermStrategy = "";
+  let resistanceStrategy = ""; // or support strategy for bearish
+  let riskManagement = "";
+  let takeProfit = "";
+
   if (trendBull) {
-    const pullback = supports[1] || supports[0] || piv.P;
-    const targets = resistances.slice().reverse(); // ascending
-    lines.push(`- Tabloya göre yükseliş olasılığı daha yüksek 🚀 Long tarafı ön planda değerlendirilebilir.`);
-    lines.push(`- Fiyat ${formatNumber(pullback)} bandına geri çekilip güçlü bir dönüş sinyali verirse long işleme girilebilir. Hedefler: ${targets.map(v=>formatNumber(v)).join(', ')}.`);
-    lines.push(`- Stop-loss için son swing low ve/veya ${formatNumber(supports[0] || swingLow)} altı takip edilmeli.`);
-    lines.push(`- Eğer ${formatNumber(supports[0] || swingLow)} altında net kapanışlar gelirse bullish bias zayıflar; daha derin düzeltme riski oluşur.`);
-    lines.push(`- İşleme girmeden önce teyit mumu/örüntüsü bekleyin; volatilite, spread ve fake-out risklerine dikkat.`);
+    outlook = "Yükseliş eğilimi koruyor";
+    expectation = `“Fiyatın ${formatNumber(r1)} bölgesine doğru yükselişini sürdürme ihtimali yüksek. Bu seviyenin üzerinde güçlü bir kapanış gelirse ${formatNumber(r2)} hedefi devreye girebilir.”`;
+    
+    shortTermStrategy = `Kısa Vadeli Yaklaşım:\n${formatNumber(s1)} – ${formatNumber(s2)} bandı tepki bölgesi olarak izlenebilir. Fiyat bu aralıkta güç topladığı sürece kısa vadeli alım fırsatı oluşabilir.`;
+    
+    resistanceStrategy = `Direnç Stratejisi:\n${formatNumber(r1)} üzeri kapanışlar gelirse yükseliş ivmesi güçlenir ve fiyatın üst dirençlere doğru hareket etme olasılığı artar.`;
+    
+    riskManagement = `Risk Yönetimi (Stop):\nStop seviyesi: ${formatNumber(s2)} altı net kapanış.\nBu seviyenin altında trend zayıflar ve kısa vadeli senaryo geçersiz sayılır.`;
+    
+    takeProfit = `Take Profit (TP) Bölgeleri:\n${formatNumber(r1)} kırılımı sonrası ilk kar alma bölgesi ${formatNumber(r2)}\nİkinci kar alma bölgesi ${formatNumber(r3)}`;
   } else {
-    const bounce = resistances[resistances.length-1] || piv.P;
-    const targets = supports.slice().reverse(); // descending
-    lines.push(`- Görünüm zayıf; kısa vadede satış baskısı ağır basıyor. Kısa/short tarafı daha mantıklı olabilir.`);
-    lines.push(`- ${formatNumber(bounce)} civarına tepki yükselişleri satış fırsatı sunabilir. Hedefler: ${targets.map(v=>formatNumber(v)).join(', ')}.`);
-    lines.push(`- Stop-loss için yakın direnç üstü takip edilmeli. ${formatNumber(resistances[0] || swingHigh)} üzeri kapanışlar senaryoyu geçersiz kılar.`);
+    outlook = "Düşüş baskısı hakim";
+    expectation = `“Fiyatın ${formatNumber(s1)} bölgesine doğru geri çekilme ihtimali yüksek. Bu seviyenin altında kalıcılık sağlanırsa ${formatNumber(s2)} hedefi devreye girebilir.”`;
+    
+    shortTermStrategy = `Kısa Vadeli Yaklaşım:\n${formatNumber(r1)} – ${formatNumber(r2)} bandı direnç bölgesi olarak izlenebilir. Fiyat bu aralıkta baskı gördüğü sürece kısa vadeli satış fırsatı oluşabilir.`;
+    
+    resistanceStrategy = `Destek Stratejisi:\n${formatNumber(s1)} altı kapanışlar gelirse düşüş ivmesi hızlanır ve fiyatın alt desteklere doğru hareket etme olasılığı artar.`;
+    
+    riskManagement = `Risk Yönetimi (Stop):\nStop seviyesi: ${formatNumber(r2)} üzeri net kapanış.\nBu seviyenin üzerinde satış baskısı azalır ve senaryo geçersiz sayılabilir.`;
+    
+    takeProfit = `Take Profit (TP) Bölgeleri:\n${formatNumber(s1)} kırılımı sonrası ilk kar alma bölgesi ${formatNumber(s2)}\nİkinci kar alma bölgesi ${formatNumber(s3)}`;
   }
+
+  const lines = [];
+  lines.push(`ALEXA – ${displaySymbol} ANALİZİ`);
+  lines.push('Destek Seviyeleri\n');
+  lines.push(`1. Destek: ${formatNumber(s1)}`);
+  lines.push(`2. Destek: ${formatNumber(s2)}`);
+  
+  lines.push('\nDirenç Seviyeleri\n');
+  lines.push(`1. Direnç: ${formatNumber(r1)}`);
+  lines.push(`2. Direnç: ${formatNumber(r2)}`);
+
+  lines.push('\nYapay Zeka Beklentisi\n');
+  lines.push('Alexa’nın trend ve momentum analizine göre:');
+  lines.push(`Genel görünüm: ${outlook}`);
+  lines.push(`Momentum: ${momentumStr}`);
+  lines.push(`Beklenti:\n${expectation}`);
+
+  lines.push(`\nİşlem Stratejisi (${displaySymbol})\n`);
+  lines.push(shortTermStrategy);
+  lines.push(resistanceStrategy);
+
+  lines.push(`\n${riskManagement}`);
+  lines.push(`\n${takeProfit}`);
 
   const text = lines.join('\n');
   return {

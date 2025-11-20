@@ -1,0 +1,96 @@
+<div class="container-fluid">
+    <h1 class="h2 mb-4">API Ayarları</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Binance API Anahtarları</h5>
+                </div>
+                <div class="card-body">
+                    <% if (hasApiKeys) { %>
+                        <div class="alert alert-success mb-4">
+                            <h5><i class="bi bi-check-circle me-2"></i> API Anahtarları Tanımlı</h5>
+                            <p class="mb-0">API anahtarlarınız sisteme kaydedilmiştir. Değiştirmek isterseniz mevcut anahtarlarınızı silip yeni anahtarlar ekleyebilirsiniz.</p>
+                        </div>
+                        
+                        <form action="/api-settings/delete" method="POST" onsubmit="return confirm('API anahtarlarınızı silmek istediğinizden emin misiniz?');">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-1"></i> API Anahtarlarını Sil
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <form action="/api-settings" method="POST" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="apiKey" class="form-label">API Key</label>
+                                <input type="text" class="form-control" id="apiKey" name="apiKey" required>
+                                <div class="invalid-feedback">API Key gereklidir.</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="apiSecret" class="form-label">API Secret</label>
+                                <input type="text" class="form-control" id="apiSecret" name="apiSecret" required>
+                                <div class="invalid-feedback">API Secret gereklidir.</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">API Anahtarlarını Kaydet</button>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Talimatlar</h5>
+                </div>
+                <div class="card-body">
+                    <p>API anahtarlarınızı oluşturmak için aşağıdaki adımları izleyin:</p>
+                    
+                    <ol>
+                        <li>Binance hesabınıza giriş yapın</li>
+                        <li>Sağ üst köşedeki profil simgesine tıklayın ve "API Yönetimi"ni seçin</li>
+                        <li>"API Oluştur" butonuna tıklayın</li>
+                        <li>Güvenlik doğrulamasını tamamlayın</li>
+                        <li>API anahtarınıza bir etiket ekleyin (örn. "TraderProBot")</li>
+                        <li>Aşağıdaki izinleri etkinleştirin:
+                            <ul>
+                                <li>Enable Reading</li>
+                                <li>Enable Futures</li>
+                            </ul>
+                        </li>
+                        <li>API Key ve API Secret değerlerini kopyalayıp sol taraftaki forma yapıştırın</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Güvenlik Uyarısı:</strong> API anahtarlarınızı kimseyle paylaşmayın! Sistemimiz API anahtarlarınızı güvenli bir şekilde şifreleyerek saklar.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form doğrulama için JavaScript
+(function() {
+    'use strict';
+    
+    // Tüm formları seç
+    var forms = document.querySelectorAll('.needs-validation');
+    
+    // Form gönderimini engelle ve doğrulama uygula
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>

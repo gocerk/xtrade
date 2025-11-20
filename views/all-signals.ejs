@@ -1,0 +1,344 @@
+<!-- all-signals.ejs -->
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Tüm Sinyaller</h1>
+        <div>
+            <a href="/dashboard" class="btn btn-outline-secondary">
+                <i class="bi bi-house me-1"></i> Ana Sayfa
+            </a>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0">Filtreler</h5>
+        </div>
+        <div class="card-body">
+            <form id="filterForm" action="/all-signals" method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label for="coin" class="form-label">Coin</label>
+                    <select class="form-select" id="coin" name="coin">
+                        <option value="">Tümü</option>
+                        <% if (locals.coins && coins.length > 0) { %>
+                            <% coins.forEach(coin => { %>
+                                <option value="<%= coin %>" <%= locals.selectedFilters && selectedFilters.coin === coin ? 'selected' : '' %>><%= coin %></option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="action" class="form-label">İşlem Tipi</label>
+                    <select class="form-select" id="action" name="action">
+                        <option value="">Tümü</option>
+                        <option value="BUY" <%= locals.selectedFilters && selectedFilters.action === 'BUY' ? 'selected' : '' %>>LONG</option>
+                        <option value="SELL" <%= locals.selectedFilters && selectedFilters.action === 'SELL' ? 'selected' : '' %>>SHORT</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Durum</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">Tümü</option>
+                        <option value="ACTIVE" <%= locals.selectedFilters && selectedFilters.status === 'ACTIVE' ? 'selected' : '' %>>Aktif</option>
+                        <option value="COMPLETED" <%= locals.selectedFilters && selectedFilters.status === 'COMPLETED' ? 'selected' : '' %>>Tamamlandı</option>
+                        <option value="STOPPED" <%= locals.selectedFilters && selectedFilters.status === 'STOPPED' ? 'selected' : '' %>>Durduruldu</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="dateRange" class="form-label">Tarih Aralığı</label>
+                    <select class="form-select" id="dateRange" name="dateRange">
+                        <option value="all" <%= locals.selectedFilters && selectedFilters.dateRange === 'all' ? 'selected' : '' %>>Tüm Zamanlar</option>
+                        <option value="today" <%= locals.selectedFilters && selectedFilters.dateRange === 'today' ? 'selected' : '' %>>Bugün</option>
+                        <option value="week" <%= locals.selectedFilters && selectedFilters.dateRange === 'week' ? 'selected' : '' %>>Son 7 Gün</option>
+                        <option value="month" <%= locals.selectedFilters && selectedFilters.dateRange === 'month' ? 'selected' : '' %>>Son 30 Gün</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-filter me-1"></i> Filtrele
+                    </button>
+                    <a href="/all-signals" class="btn btn-outline-secondary ms-2">
+                        <i class="bi bi-x-circle me-1"></i> Filtreleri Temizle
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Tüm Sinyaller</h5>
+            <div class="d-flex align-items-center">
+                <span class="me-2">Sırala:</span>
+                <select class="form-select form-select-sm" id="sort" name="sort" style="width: auto;">
+                    <option value="newest" <%= sortOption === 'newest' ? 'selected' : '' %>>En Yeni</option>
+                    <option value="oldest" <%= sortOption === 'oldest' ? 'selected' : '' %>>En Eski</option>
+                    <option value="coin_asc" <%= sortOption === 'coin_asc' ? 'selected' : '' %>>Coin (A-Z)</option>
+                    <option value="coin_desc" <%= sortOption === 'coin_desc' ? 'selected' : '' %>>Coin (Z-A)</option>
+                    <option value="profit_desc" <%= sortOption === 'profit_desc' ? 'selected' : '' %>>Kar (Yüksekten Düşüğe)</option>
+                    <option value="profit_asc" <%= sortOption === 'profit_asc' ? 'selected' : '' %>>Kar (Düşükten Yükseğe)</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <% if (locals.signals && signals.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Coin</th>
+                                <th>İşlem</th>
+                                <th>Giriş Fiyatı</th>
+                                <th>Mevcut Fiyat</th>
+                                <th>Kâr/Zarar</th>
+                                <th>Stop Loss</th>
+                                <th>TP1</th>
+                                <th>TP2</th>
+                                <th>TP3</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% signals.forEach(signal => { %>
+                                <tr>
+                                    <td><%= signal.coin %></td>
+                                    <td>
+                                        <span class="badge <%= signal.action.toUpperCase() === 'BUY' ? 'bg-success' : 'bg-danger' %>">
+                                            <%= signal.action.toUpperCase() === 'BUY' ? 'LONG' : 'SHORT' %>
+                                        </span>
+                                    </td>
+                                    <td><%= signal.entry_price ? parseFloat(signal.entry_price).toFixed(2) : '-' %></td>
+                                    <td><%= signal.current_price ? parseFloat(signal.current_price).toFixed(2) : '-' %></td>
+                                    <td class="<%= signal.profit_percentage > 0 ? 'text-success' : signal.profit_percentage < 0 ? 'text-danger' : '' %>">
+                                        <%= signal.profit_percentage ? (signal.profit_percentage > 0 ? '+' : '') + parseFloat(signal.profit_percentage).toFixed(2) + '%' : '-' %>
+                                    </td>
+                                    <td><%= signal.stop_loss ? parseFloat(signal.stop_loss).toFixed(2) : '-' %></td>
+                                    <td><%= signal.tp1_price ? parseFloat(signal.tp1_price).toFixed(2) : '-' %></td>
+                                    <td><%= signal.tp2_price ? parseFloat(signal.tp2_price).toFixed(2) : '-' %></td>
+                                    <td><%= signal.tp3_price ? parseFloat(signal.tp3_price).toFixed(2) : '-' %></td>
+                                    <td><%= new Date(signal.created_at).toLocaleString() %></td>
+                                    <td>
+                                        <span class="badge <%= signal.status === 'ACTIVE' ? 'bg-primary' : signal.status === 'COMPLETED' ? 'bg-success' : 'bg-secondary' %>">
+                                            <%= signal.status === 'ACTIVE' ? 'Aktif' : signal.status === 'COMPLETED' ? 'Tamamlandı' : 'Durduruldu' %>
+                                            <% if (signal.tp_hit) { %>
+                                                (TP<%= signal.tp_hit %>)
+                                            <% } %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <% if (signal.status === 'ACTIVE') { %>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    İşlem
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <form action="/signals/<%= signal.id %>/close" method="POST" onsubmit="return confirm('Bu sinyali kapatmak istediğinizden emin misiniz?');">
+                                                            <button type="submit" class="dropdown-item">
+                                                                <i class="bi bi-x-circle me-1"></i> Sinyali Kapat
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item execute-trade" 
+                                                            data-coin="<%= signal.coin %>" 
+                                                            data-action="<%= signal.action %>" 
+                                                            data-price="<%= signal.current_price %>">
+                                                            <i class="bi bi-currency-exchange me-1"></i> Manuel İşlem
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        <% } else { %>
+                                            <button class="btn btn-sm btn-outline-primary execute-trade" 
+                                                data-coin="<%= signal.coin %>" 
+                                                data-action="<%= signal.action %>" 
+                                                data-price="<%= signal.current_price %>">
+                                                <i class="bi bi-currency-exchange me-1"></i> Tekrar İşlem
+                                            </button>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Sayfalama -->
+                <% if (locals.totalPages && totalPages > 1) { %>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <span>Toplam <%= totalCount %> sinyal, <%= (page - 1) * limit + 1 %>-<%= Math.min(page * limit, totalCount) %> arası gösteriliyor</span>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination mb-0">
+                                <li class="page-item <%= page === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="<%= buildPageUrl(page - 1) %>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                
+                                <% 
+                                let startPage = Math.max(1, page - 2);
+                                let endPage = Math.min(totalPages, startPage + 4);
+                                
+                                if (endPage - startPage < 4) {
+                                    startPage = Math.max(1, endPage - 4);
+                                }
+                                
+                                for (let i = startPage; i <= endPage; i++) { 
+                                %>
+                                    <li class="page-item <%= page === i ? 'active' : '' %>">
+                                        <a class="page-link" href="<%= buildPageUrl(i) %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                
+                                <li class="page-item <%= page === totalPages ? 'disabled' : '' %>">
+                                    <a class="page-link" href="<%= buildPageUrl(page + 1) %>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="text-center py-5">
+                    <i class="bi bi-search fs-1 text-muted"></i>
+                    <p class="mt-3 mb-0">Eşleşen sinyal bulunamadı.</p>
+                    <p class="text-muted">Farklı filtreleme kriterleri deneyebilir veya tüm filtreleri temizleyebilirsiniz.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Trade Modal -->
+<div class="modal fade" id="tradeModal" tabindex="-1" aria-labelledby="tradeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tradeModalLabel">İşlem Oluştur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="tradeForm">
+                    <input type="hidden" id="trade_coin" name="coin">
+                    <input type="hidden" id="trade_action" name="action">
+                    <input type="hidden" id="trade_price" name="price">
+                    
+                    <div class="mb-3">
+                        <label for="leverage" class="form-label">Kaldıraç (1-125)</label>
+                        <input type="number" class="form-control" id="leverage" name="leverage" min="1" max="125" value="10" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="amountInUSD" class="form-label">İşlem Başına USDT Miktarı</label>
+                        <input type="number" class="form-control" id="amountInUSD" name="amountInUSD" step="0.01" min="1" value="100" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="profitPercent1" class="form-label">1. Kâr Alma Yüzdesi</label>
+                        <input type="number" class="form-control" id="profitPercent1" name="profitPercent1" step="0.01" min="0.1" value="1.5" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="profitPercent2" class="form-label">2. Kâr Alma Yüzdesi (İsteğe Bağlı)</label>
+                        <input type="number" class="form-control" id="profitPercent2" name="profitPercent2" step="0.01" min="0" value="3">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="stopLossPercent" class="form-label">Zarar Kesme Yüzdesi</label>
+                        <input type="number" class="form-control" id="stopLossPercent" name="stopLossPercent" step="0.01" min="0.1" value="1" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="executeTrade">İşlemi Oluştur</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tradeModal = new bootstrap.Modal(document.getElementById('tradeModal'));
+        
+        // Sıralama dropdown değişikliğini dinle
+        document.getElementById('sort').addEventListener('change', function() {
+            // Mevcut URL'yi al
+            const url = new URL(window.location.href);
+            
+            // Sıralama parametresini güncelle
+            url.searchParams.set('sort', this.value);
+            
+            // Sayfa parametresini sıfırla
+            url.searchParams.set('page', 1);
+            
+            // Yeni URL'ye yönlendir
+            window.location.href = url.toString();
+        });
+        
+        // İşlem butonlarına event listener ekle
+        document.querySelectorAll('.execute-trade').forEach(button => {
+            button.addEventListener('click', function() {
+                const coin = this.getAttribute('data-coin');
+                const action = this.getAttribute('data-action');
+                const price = this.getAttribute('data-price');
+                
+                document.getElementById('trade_coin').value = coin;
+                document.getElementById('trade_action').value = action;
+                document.getElementById('trade_price').value = price;
+                document.getElementById('tradeModalLabel').textContent = `${coin} için ${action.toUpperCase() === 'BUY' ? 'LONG' : 'SHORT'} İşlemi`;
+                
+                tradeModal.show();
+            });
+        });
+        
+        // İşlem oluşturma butonu
+        document.getElementById('executeTrade').addEventListener('click', function() {
+            const formData = new FormData(document.getElementById('tradeForm'));
+            const data = Object.fromEntries(formData.entries());
+            
+            // Butonu devre dışı bırak ve yükleniyor göster
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> İşleniyor...';
+            
+            fetch('/trade', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    showNotification('İşlem başarıyla oluşturuldu', 'success');
+                    tradeModal.hide();
+                } else {
+                    showNotification(result.error || 'Bir hata oluştu', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Trade error:', error);
+                showNotification('İşlem oluşturulurken bir hata oluştu', 'error');
+            })
+            .finally(() => {
+                // Butonu sıfırla
+                this.disabled = false;
+                this.innerHTML = 'İşlemi Oluştur';
+            });
+        });
+        
+        // Bildirim gösterme
+        function showNotification(message, type) {
+            // Ana sayfadaki bildirim fonksiyonunu kullan (eğer mevcutsa)
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(message, type);
+            } else {
+                alert(message);
+            }
+        }
+    });
+</script>

@@ -1,0 +1,154 @@
+<div class="container-fluid">
+    <h1 class="h2 mb-4">Admin Paneli</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Kullanıcı</h5>
+                    <p class="display-4 text-primary"><%= locals.stats && stats.total_users || 0 %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Aktif Aboneler</h5>
+                    <p class="display-4 text-success"><%= locals.stats && stats.active_subscribers || 0 %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Sinyal</h5>
+                    <p class="display-4 text-info"><%= locals.stats && stats.total_signals || 0 %></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Otomatik İşlem Kullanıcılar</h5>
+                    <p class="display-4 text-warning"><%= locals.stats && stats.autotrade_users || 0 %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Son Kullanıcılar</h5>
+                    <a href="/admin/users" class="btn btn-sm btn-primary">Tüm Kullanıcılar</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı Adı</th>
+                                    <th>E-posta</th>
+                                    <th>Kayıt Tarihi</th>
+                                    <th>Son Giriş</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (locals.recentUsers && recentUsers.length > 0) { %>
+                                    <% recentUsers.forEach(user => { %>
+                                        <tr>
+                                            <td><%= user.username %></td>
+                                            <td><%= user.email %></td>
+                                            <td><%= new Date(user.created_at).toLocaleDateString() %></td>
+                                            <td><%= user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Giriş Yapılmadı' %></td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="4" class="text-center">Henüz kullanıcı yok</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Son Sinyaller</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Coin</th>
+                                    <th>İşlem</th>
+                                    <th>Fiyat</th>
+                                    <th>Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (locals.recentSignals && recentSignals.length > 0) { %>
+                                    <% recentSignals.forEach(signal => { %>
+                                        <tr>
+                                            <td><%= signal.coin %></td>
+                                            <td>
+                                                <span class="badge <%= signal.action.toLowerCase() === 'buy' || signal.action.toLowerCase() === 'long' ? 'bg-success' : 'bg-danger' %>">
+                                                    <%= signal.action.toUpperCase() %>
+                                                </span>
+                                            </td>
+                                            <td><%= signal.price %></td>
+                                            <td><%= new Date(signal.created_at).toLocaleDateString() %></td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="4" class="text-center">Henüz sinyal yok</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Hızlı İşlemler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/create-user" class="btn btn-primary w-100">
+                                <i class="bi bi-person-plus me-2"></i> Yeni Kullanıcı Oluştur
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/create-key" class="btn btn-success w-100">
+                                <i class="bi bi-key me-2"></i> Lisans Anahtarı Oluştur
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/subscribers" class="btn btn-info w-100 text-white">
+                                <i class="bi bi-people me-2"></i> Aboneleri Görüntüle
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/send-message" class="btn btn-warning w-100">
+                                <i class="bi bi-envelope me-2"></i> Mesaj Gönder
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

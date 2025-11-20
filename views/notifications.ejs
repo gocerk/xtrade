@@ -1,0 +1,36 @@
+<div class="container-fluid">
+    <h1 class="h2 mb-4">Bildirimler</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Tüm Bildirimler</h5>
+        </div>
+        <div class="card-body">
+            <% if (locals.notifications && notifications.length > 0) { %>
+                <div class="list-group">
+                    <% notifications.forEach(notification => { %>
+                        <div class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    <i class="bi bi-<%= notification.type === 'success' ? 'check-circle' : notification.type === 'error' ? 'exclamation-circle' : notification.type === 'signal' ? 'graph-up' : 'info-circle' %> me-2 text-<%= notification.type === 'success' ? 'success' : notification.type === 'error' ? 'danger' : notification.type === 'signal' ? 'primary' : 'info' %>"></i>
+                                    <%= notification.type === 'success' ? 'Başarı' : notification.type === 'error' ? 'Hata' : notification.type === 'signal' ? 'Sinyal' : 'Bilgi' %>
+                                </h5>
+                                <small><%= new Date(notification.created_at).toLocaleString() %></small>
+                            </div>
+                            <p class="mb-1"><%= notification.message %></p>
+                            <% if (notification.is_read) { %>
+                                <small class="text-muted">Okundu</small>
+                            <% } else { %>
+                                <small class="text-primary">Yeni</small>
+                            <% } %>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-bell me-2"></i> Henüz bildiriminiz bulunmamaktadır.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>

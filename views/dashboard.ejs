@@ -1,0 +1,514 @@
+<div class="dashboard-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="h2">Ana Sayfa</h1>
+        <!-- Language Selector with Flags -->
+        <div class="language-selector">
+            <div class="d-flex align-items-center gap-3">
+                <div class="flag-buttons">
+                    <button class="flag-btn active" data-lang="tr" title="Türkçe">
+                        🇹🇷
+                    </button>
+                    <button class="flag-btn" data-lang="en" title="English">
+                        🇺🇸
+                    </button>
+                    <button class="flag-btn" data-lang="az" title="Azərbaycan">
+                        🇦🇿
+                    </button>
+                    <button class="flag-btn" data-lang="ru" title="Русский">
+                        🇷🇺
+                    </button>
+                </div>
+                <!-- Google Translate Widget -->
+                <div id="google_translate_element"></div>
+            </div>
+        </div>
+    </div>
+    <div class="subscription-info">
+        <% if (locals.isSubscriber) { %>
+            <span class="badge bg-success">Aktif Abonelik</span>
+            <span class="subscription-date">Bitiş: <%= locals.endTime %></span>
+        <% } else { %>
+            <span class="badge bg-danger">Abonelik Yok</span>
+            <a href="/license" class="btn btn-sm btn-primary">Lisans Ekle</a>
+        <% } %>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted fw-normal mt-0">Toplam İşlem</h6>
+                        <h3 class="my-2"><%= locals.stats && locals.stats.total_trades || 0 %></h3>
+                    </div>
+                    <div class="avatar-sm rounded-circle bg-primary">
+                        <i class="bi bi-bar-chart-line text-white fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted fw-normal mt-0">Karlı İşlemler</h6>
+                        <h3 class="my-2 text-success"><%= locals.stats && locals.stats.profitable_trades || 0 %></h3>
+                    </div>
+                    <div class="avatar-sm rounded-circle bg-success">
+                        <i class="bi bi-graph-up-arrow text-white fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3 mb-4 mb-md-0">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted fw-normal mt-0">Zararlı İşlemler</h6>
+                        <h3 class="my-2 text-danger"><%= locals.stats && locals.stats.losing_trades || 0 %></h3>
+                    </div>
+                    <div class="avatar-sm rounded-circle bg-danger">
+                        <i class="bi bi-graph-down-arrow text-white fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted fw-normal mt-0">Ortalama Kâr</h6>
+                        <h3 class="my-2 <%= parseFloat(locals.stats && locals.stats.avg_profit || 0) >= 0 ? 'text-success' : 'text-danger' %>">
+                            <%= locals.stats && locals.stats.avg_profit ? parseFloat(locals.stats.avg_profit).toFixed(2) : '0.00' %>%
+                        </h3>
+                    </div>
+                    <div class="avatar-sm rounded-circle bg-info">
+                        <i class="bi bi-percent text-white fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Son Sinyaller</h5>
+                <a href="/all-signals" class="btn btn-sm btn-outline-primary">Tümünü Gör</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Coin</th>
+                                <th>İşlem</th>
+                                <th>Fiyat</th>
+                                <th>Timeframe</th>
+                                <th>Tarih</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (locals.signals && locals.signals.length > 0) { %>
+                                <% signals.forEach(signal => { %>
+                                    <tr>
+                                        <td><%= signal.coin %></td>
+                                        <td>
+                                            <span class="badge <%= signal.action.toLowerCase() === 'buy' || signal.action.toLowerCase() === 'long' ? 'bg-success' : 'bg-danger' %>">
+                                                <%= signal.action.toUpperCase() %>
+                                            </span>
+                                        </td>
+                                        <td><%= signal.price %></td>
+                                        <td><%= signal.timeframe || '--' %></td>
+                                        <td><%= new Date(signal.created_at).toLocaleString() %></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary execute-trade" 
+                                                    data-coin="<%= signal.coin %>" 
+                                                    data-action="<%= signal.action %>" 
+                                                    data-price="<%= signal.price %>">
+                                                İşlem Yap
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="6" class="text-center">Henüz sinyal yok</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-lg-4 mt-4 mt-lg-0">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Son Bildirimler</h5>
+                <a href="/notifications" class="btn btn-sm btn-outline-primary">Tümünü Gör</a>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <% if (locals.notifications && locals.notifications.length > 0) { %>
+                        <% notifications.forEach(notification => { %>
+                            <li class="list-group-item border-0 px-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="avatar-sm rounded-circle bg-<%= notification.type === 'success' ? 'success' : notification.type === 'error' ? 'danger' : notification.type === 'signal' ? 'primary' : 'info' %>">
+                                            <i class="bi bi-<%= notification.type === 'success' ? 'check-circle' : notification.type === 'error' ? 'exclamation-circle' : notification.type === 'signal' ? 'graph-up' : 'info-circle' %> text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <p class="mb-0"><%= notification.message %></p>
+                                        <small class="text-muted"><%= new Date(notification.created_at).toLocaleString() %></small>
+                                    </div>
+                                </div>
+                            </li>
+                        <% }); %>
+                    <% } else { %>
+                        <li class="list-group-item border-0 px-0">
+                            <p class="text-center mb-0">Henüz bildirim yok</p>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trade Modal -->
+<div class="modal fade" id="tradeModal" tabindex="-1" aria-labelledby="tradeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tradeModalLabel">İşlem Oluştur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="tradeForm">
+                    <input type="hidden" id="trade_coin" name="coin">
+                    <input type="hidden" id="trade_action" name="action">
+                    <input type="hidden" id="trade_price" name="price">
+                    
+                    <div class="mb-3">
+                        <label for="leverage" class="form-label">Kaldıraç (1-125)</label>
+                        <input type="number" class="form-control" id="leverage" name="leverage" min="1" max="125" value="10" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="amountInUSD" class="form-label">İşlem Başına USDT Miktarı</label>
+                        <input type="number" class="form-control" id="amountInUSD" name="amountInUSD" step="0.01" min="1" value="100" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="profitPercent1" class="form-label">1. Kâr Alma Yüzdesi</label>
+                        <input type="number" class="form-control" id="profitPercent1" name="profitPercent1" step="0.01" min="0.1" value="1.5" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="profitPercent2" class="form-label">2. Kâr Alma Yüzdesi (İsteğe Bağlı)</label>
+                        <input type="number" class="form-control" id="profitPercent2" name="profitPercent2" step="0.01" min="0" value="3">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="stopLossPercent" class="form-label">Zarar Kesme Yüzdesi</label>
+                        <input type="number" class="form-control" id="stopLossPercent" name="stopLossPercent" step="0.01" min="0.1" value="1" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="executeTrade">İşlemi Oluştur</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.language-selector {
+    margin-top: 5px;
+}
+
+.flag-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.flag-btn {
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    font-size: 22px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    outline: none;
+}
+
+.flag-btn:hover {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.flag-btn.active {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.2);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Google Translate Widget Styling */
+#google_translate_element {
+    font-size: 14px;
+}
+
+.goog-te-gadget {
+    font-family: inherit !important;
+    font-size: 14px !important;
+}
+
+.goog-te-gadget-simple {
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    color: #495057 !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+}
+
+.goog-te-gadget-simple:hover {
+    background-color: #e9ecef !important;
+    border-color: #adb5bd !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value {
+    color: #495057 !important;
+    font-size: 14px !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value:before {
+    content: "🌐";
+    margin-right: 5px;
+}
+
+/* Google Translate banner'ını gizle */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
+
+body {
+    top: 0px !important;
+}
+
+.goog-te-banner-frame {
+    display: none !important;
+}
+
+/* Mobil responsive */
+@media (max-width: 768px) {
+    .dashboard-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .language-selector .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .flag-buttons {
+        gap: 6px;
+    }
+    
+    .flag-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+}
+</style>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'tr',
+        includedLanguages: 'tr,en,az,ru',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+    }, 'google_translate_element');
+    
+    // Google Translate yüklendikten sonra
+    setTimeout(() => {
+        initializeFlagButtons();
+        checkSavedLanguage();
+    }, 2000);
+}
+
+function initializeFlagButtons() {
+    const flagButtons = document.querySelectorAll('.flag-btn');
+    
+    flagButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const lang = this.getAttribute('data-lang');
+            console.log('Bayrak tıklandı:', lang);
+            changeLanguage(lang);
+        });
+    });
+}
+
+function changeLanguage(targetLang) {
+    console.log('Dil değiştiriliyor:', targetLang);
+    
+    // Google Translate select elementini bul
+    const selectElement = document.querySelector('.goog-te-combo');
+    
+    if (selectElement) {
+        console.log('Google Translate select bulundu');
+        
+        // Seçimi yap
+        selectElement.value = targetLang;
+        selectElement.dispatchEvent(new Event('change'));
+        
+        // Aktif bayrağı ayarla
+        setActiveFlag(targetLang);
+        
+        // Dili kaydet
+        localStorage.setItem('selectedLanguage', targetLang);
+        
+        console.log('Dil değiştirildi:', targetLang);
+    } else {
+        console.log('Google Translate select bulunamadı');
+        
+        // Eğer select bulunamazsa, doğrudan Google Translate dropdown'ını tıkla
+        const dropdown = document.querySelector('.goog-te-gadget-simple');
+        if (dropdown) {
+            dropdown.click();
+        }
+    }
+}
+
+function setActiveFlag(lang) {
+    // Tüm bayraklardan active class'ını kaldır
+    document.querySelectorAll('.flag-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Seçilen bayrağa active class'ı ekle
+    const activeFlag = document.querySelector(`.flag-btn[data-lang="${lang}"]`);
+    if (activeFlag) {
+        activeFlag.classList.add('active');
+    }
+}
+
+function checkSavedLanguage() {
+    // Kaydedilmiş dili kontrol et
+    const savedLang = localStorage.getItem('selectedLanguage');
+    if (savedLang && savedLang !== 'tr') {
+        setTimeout(() => {
+            changeLanguage(savedLang);
+        }, 1000);
+    } else {
+        setActiveFlag('tr');
+    }
+}
+
+// Sayfa yüklendiğinde
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM yüklendi');
+    
+    // Trade butonları
+    const tradeButtons = document.querySelectorAll('.execute-trade');
+    if (tradeButtons.length > 0) {
+        const tradeModal = new bootstrap.Modal(document.getElementById('tradeModal'));
+        
+        tradeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const coin = this.getAttribute('data-coin');
+                const action = this.getAttribute('data-action');
+                const price = this.getAttribute('data-price');
+                
+                document.getElementById('trade_coin').value = coin;
+                document.getElementById('trade_action').value = action;
+                document.getElementById('trade_price').value = price;
+                document.getElementById('tradeModalLabel').textContent = `${coin} için ${action.toUpperCase()} İşlemi`;
+                
+                tradeModal.show();
+            });
+        });
+        
+        // İşlem oluşturma
+        document.getElementById('executeTrade').addEventListener('click', function() {
+            const formData = new FormData(document.getElementById('tradeForm'));
+            const data = Object.fromEntries(formData.entries());
+            
+            fetch('/trade', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    showNotification('İşlem başarıyla oluşturuldu', 'success');
+                    tradeModal.hide();
+                } else {
+                    showNotification(result.error || 'Bir hata oluştu', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Trade error:', error);
+                showNotification('İşlem oluşturulurken bir hata oluştu', 'error');
+            });
+        });
+    }
+});
+
+// Google Translate script'ini yükle
+window.addEventListener('load', function() {
+    console.log('Sayfa yüklendi, Google Translate script ekleniyor');
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    document.head.appendChild(script);
+});
+
+function showNotification(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>

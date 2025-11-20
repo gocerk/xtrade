@@ -1,0 +1,94 @@
+<div class="container">
+    <h1 class="h2 mb-4">Yeni Kullanıcı Oluştur</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Kullanıcı Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/create-user" method="POST" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Kullanıcı Adı</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                            <div class="invalid-feedback">Kullanıcı adı gereklidir.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-posta Adresi</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                            <div class="invalid-feedback">Geçerli bir e-posta adresi gereklidir.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Şifre</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <div class="invalid-feedback">Şifre gereklidir.</div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin" value="1">
+                            <label class="form-check-label" for="is_admin">Admin Yetkisi Ver</label>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="/admin/users" class="btn btn-outline-secondary">İptal</a>
+                            <button type="submit" class="btn btn-primary">Kullanıcıyı Oluştur</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Bilgi</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5>Önemli Bilgi!</h5>
+                        <p>Kullanıcılar sadece admin tarafından oluşturulabilir. Kullanıcı oluşturma işlemi tamamlandıktan sonra, kullanıcı bilgileri güvenli bir şekilde iletilmelidir.</p>
+                    </div>
+                    
+                    <p><strong>Admin Yetkisi:</strong> Bu kullanıcıya admin yetkileri vermek için "Admin Yetkisi Ver" seçeneğini işaretleyin. Admin kullanıcıları tüm sisteme erişebilir.</p>
+                    
+                    <p><strong>Şifre Güvenliği:</strong> Güçlü bir şifre oluşturun. Şifre büyük-küçük harfler, rakamlar ve özel karakterler içermelidir.</p>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Hızlı İşlemler</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/users" class="btn btn-outline-primary mb-2 w-100">Tüm Kullanıcılar</a>
+                    <a href="/admin" class="btn btn-outline-secondary w-100">Admin Paneline Dön</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form doğrulama için JavaScript
+(function() {
+    'use strict';
+    
+    // Tüm formları seç
+    var forms = document.querySelectorAll('.needs-validation');
+    
+    // Form gönderimini engelle ve doğrulama uygula
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>

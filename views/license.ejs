@@ -1,0 +1,92 @@
+<div class="container py-4">
+    <h1 class="h2 mb-4">Lisans Yönetimi</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Abonelik Durumu</h5>
+                </div>
+                <div class="card-body">
+                    <% if (locals.isSubscriber) { %>
+                        <div class="alert alert-success">
+                            <h5><i class="bi bi-check-circle me-2"></i> Aktif Abonelik</h5>
+                            <p class="mb-0">Aboneliğinizin bitiş tarihi: <strong><%= locals.endTime %></strong></p>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-warning">
+                            <h5><i class="bi bi-exclamation-triangle me-2"></i> Aktif Abonelik Yok</h5>
+                            <p class="mb-0">Sistem özelliklerinden yararlanmak için lisans anahtarı kullanarak abonelik başlatın.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Lisans Anahtarı Aktivasyonu</h5>
+                </div>
+                <div class="card-body">
+                    <form action="/license" method="POST">
+                        <div class="mb-3">
+                            <label for="licenseKey" class="form-label">Lisans Anahtarı</label>
+                            <input type="text" class="form-control" id="licenseKey" name="licenseKey" required placeholder="XXXX-XXXX-XXXX-XXXX">
+                            <div class="form-text">Lisans anahtarınızı girerek aboneliğinizi etkinleştirin.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lisansı Etkinleştir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Abonelik Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Durum
+                            <% if (locals.isSubscriber) { %>
+                                <span class="badge bg-success">Aktif</span>
+                            <% } else { %>
+                                <span class="badge bg-danger">Pasif</span>
+                            <% } %>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Giriş Hakkı
+                            <span class="badge bg-primary">Sınırsız</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            API Erişimi
+                            <% if (locals.isSubscriber) { %>
+                                <span class="badge bg-success">Aktif</span>
+                            <% } else { %>
+                                <span class="badge bg-danger">Pasif</span>
+                            <% } %>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Otomatik İşlem
+                            <% if (locals.isSubscriber) { %>
+                                <span class="badge bg-success">Aktif</span>
+                            <% } else { %>
+                                <span class="badge bg-danger">Pasif</span>
+                            <% } %>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Lisans Satın Al</h5>
+                </div>
+                <div class="card-body">
+                    <p>Yeni lisans anahtarı satın almak için bizimle iletişime geçin.</p>
+                    <a href="mailto:info@aitrade.az" class="btn btn-outline-primary w-100">İletişime Geç</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

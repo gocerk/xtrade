@@ -1,0 +1,122 @@
+<div class="container-fluid">
+    <h1 class="h2 mb-4">Otomatik İşlem</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Otomatik İşlem Ayarları</h5>
+                </div>
+                <div class="card-body">
+                    <% if (!hasApiKeys) { %>
+                        <div class="alert alert-warning mb-4">
+                            <h5><i class="bi bi-exclamation-triangle me-2"></i> API Anahtarı Gerekli</h5>
+                            <p class="mb-0">Otomatik işlem yapabilmek için API anahtarlarınızı tanımlamanız gerekmektedir.</p>
+                            <div class="mt-3">
+                                <a href="/api-settings" class="btn btn-primary">API Anahtarlarını Tanımla</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="me-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="autotradeSwitch" <%= autotrade ? 'checked' : '' %> disabled>
+                                    <label class="form-check-label" for="autotradeSwitch">Otomatik İşlem</label>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="badge <%= autotrade ? 'bg-success' : 'bg-danger' %> fs-6">
+                                    <%= autotrade ? 'Aktif' : 'Pasif' %>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <p>Otomatik işlem ayarları, yeni sinyaller geldiğinde botun otomatik olarak işlem açmasını sağlar. Bu özelliği aktifleştirdiğinizde, işlem ayarlarınıza göre otomatik alım-satım yapılacaktır.</p>
+                        
+                        <form action="/auto-trade/toggle" method="POST" onsubmit="return confirm('Otomatik işlem durumunu değiştirmek istediğinizden emin misiniz?');">
+                            <button type="submit" class="btn <%= autotrade ? 'btn-danger' : 'btn-success' %>">
+                                <i class="bi <%= autotrade ? 'bi-pause-circle' : 'bi-play-circle' %> me-1"></i>
+                                <%= autotrade ? 'Otomatik İşlemi Durdur' : 'Otomatik İşlemi Başlat' %>
+                            </button>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Risk Yönetimi</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-info-circle me-2"></i> Otomatik İşlem Güvenliği</h5>
+                        <p>Otomatik işlem kullanırken risk yönetimine dikkat etmeniz önemlidir. İşlem ayarlarınızı düşük riskle başlayacak şekilde yapılandırmanızı öneririz.</p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">Öneriler</h5>
+                                    <ul class="mb-0">
+                                        <li>Toplam bakiyenizin %5'inden fazlasını tek işlemde riske atmayın</li>
+                                        <li>İşlem başına miktarı düşük tutun</li>
+                                        <li>Kaldıraç oranını makul seviyelerde tutun (10x ve altı önerilir)</li>
+                                        <li>Stop-loss kullanmayı ihmal etmeyin</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">İşlem Ayarları</h5>
+                                    <p>Otomatik işlem, İşlem Ayarları sayfanızda tanımladığınız parametrelere göre çalışacaktır:</p>
+                                    <ul class="mb-0">
+                                        <li>İşlem Başına USDT Miktarı</li>
+                                        <li>Kaldıraç</li>
+                                        <li>Kâr Alma ve Zarar Kesme Oranları</li>
+                                    </ul>
+                                    <div class="mt-2">
+                                        <a href="/settings" class="btn btn-sm btn-primary">İşlem Ayarlarını Düzenle</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Önemli Bilgiler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5><i class="bi bi-exclamation-triangle me-2"></i> Risk Uyarısı</h5>
+                        <p class="mb-0">Kripto para işlemleri yüksek risk içerir. Kaybetmeyi göze alabileceğiniz miktar ile işlem yapın. Otomatik işlem, sürekli gözetim gerektirmez ancak düzenli kontrol etmeniz önerilir.</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Otomatik İşlem Özellikleri</h5>
+                        <ul>
+                            <li>Gelen sinyalleri hızlıca işleme</li>
+                            <li>Özelleştirilmiş işlem parametreleri</li>
+                            <li>Stop-loss ve take-profit otomatik ayarları</li>
+                            <li>Bildirim sistemi</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>İstatistikler</h5>
+                        <p>Sinyal başarı oranımız genellikle %60-70 arasındadır. Aşağıdaki bağlantıdan sinyallerin geçmiş performansını inceleyebilirsiniz:</p>
+                        <a href="/signals" class="btn btn-outline-primary w-100">Sinyal İstatistikleri</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

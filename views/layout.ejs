@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* Mobil Menü Stilleri */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -280px; /* Soldan başla */
+            width: 280px;
+            height: 100vh;
+            background-color: white;
+            z-index: 1050;
+            overflow-y: auto;
+            transition: left 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #mobile-user-menu {
+            left: auto;
+            right: -280px; /* Sağdan başla */
+            transition: right 0.3s ease;
+        }
+        
+        .mobile-menu.active {
+            left: 0;
+        }
+        
+        #mobile-user-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        /* Sidebar gizle */
+        @media (max-width: 767.98px) {
+            .sidebar {
+                display: none !important;
+            }
+            
+            main {
+                margin-left: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="d-flex flex-column h-100">
+    <%- include('partials/navbar') %>
+    <div class="container-fluid">
+        <div class="row">
+            <%- include('partials/sidebar') %>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <% if (locals.error && error.length > 0) { %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <%= error %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% } %>
+                <% if (locals.success && success.length > 0) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <%= success %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% } %>
+                <% if (locals.info && info.length > 0) { %>
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <%= info %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% } %>
+                
+                <%- body %>
+            </main>
+        </div>
+    </div>
+
+    <div id="notification-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1100;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.0/dist/chart.umd.min.js"></script>
+    <script src="/js/main.js"></script>
+    
+    <script>
+        // Mobil Menü İşlevleri
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gerekli elemanları seç
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
+            
+            const mobileUserButton = document.getElementById('mobile-user-button');
+            const mobileUserMenu = document.getElementById('mobile-user-menu');
+            const mobileUserMenuClose = document.getElementById('mobile-user-menu-close');
+            
+            const mobileOverlay = document.getElementById('mobile-overlay');
+            
+            // Ana menü işlevleri
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileMenu.classList.add('active');
+                    mobileOverlay.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+            
+            if (mobileMenuClose && mobileMenu) {
+                mobileMenuClose.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    mobileOverlay.style.display = 'none';
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            // Kullanıcı menüsü işlevleri
+            if (mobileUserButton && mobileUserMenu) {
+                mobileUserButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileUserMenu.classList.add('active');
+                    mobileOverlay.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+            
+            if (mobileUserMenuClose && mobileUserMenu) {
+                mobileUserMenuClose.addEventListener('click', function() {
+                    mobileUserMenu.classList.remove('active');
+                    mobileOverlay.style.display = 'none';
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            // Overlay işlevi
+            if (mobileOverlay) {
+                mobileOverlay.addEventListener('click', function() {
+                    if (mobileMenu) mobileMenu.classList.remove('active');
+                    if (mobileUserMenu) mobileUserMenu.classList.remove('active');
+                    mobileOverlay.style.display = 'none';
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            // Bildirim rozetlerini güncelle
+            updateAllNotificationBadges();
+        });
+        
+        // WebSocket bağlantısını kur
+        const socketProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const socketUrl = `${socketProtocol}//${window.location.host}/ws?sessionId=<%= sessionId %>`;
+        const socket = new WebSocket(socketUrl);
+        
+        socket.onopen = function() {
+            console.log('WebSocket bağlantısı kuruldu');
+        };
+        
+        socket.onmessage = function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'notification') {
+                    showNotification(data.message, data.messageType);
+                    updateAllNotificationBadges();
+                }
+            } catch (error) {
+                console.error('WebSocket mesaj hatası:', error);
+            }
+        };
+        
+        socket.onclose = function() {
+            console.log('WebSocket bağlantısı kapandı');
+            // Bağlantı kaybolduğunda yeniden bağlanmayı dene
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
+        };
+        
+        socket.onerror = function(error) {
+            console.error('WebSocket hatası:', error);
+        };
+        
+        // Ping gönder (bağlantıyı canlı tut)
+        setInterval(() => {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: 'ping' }));
+            }
+        }, 30000);
+        
+        function showNotification(message, type = 'info') {
+            const notifContainer = document.getElementById('notification-container');
+            if (!notifContainer) return;
+            
+            const notification = document.createElement('div');
+            notification.className = `toast align-items-center border-0 bg-${type === 'error' ? 'danger' : type}`;
+            notification.setAttribute('role', 'alert');
+            notification.setAttribute('aria-live', 'assertive');
+            notification.setAttribute('aria-atomic', 'true');
+            
+            notification.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body text-white">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            notifContainer.appendChild(notification);
+            
+            const bsNotification = new bootstrap.Toast(notification, {
+                autohide: true,
+                delay: 5000
+            });
+            
+            bsNotification.show();
+            
+            notification.addEventListener('hidden.bs.toast', () => {
+                notification.remove();
+            });
+        }
+        
+        function updateAllNotificationBadges() {
+            fetch('/api/notifications/unread-count')
+                .then(response => response.json())
+                .then(data => {
+                    // Tüm bildirim rozetlerini güncelle
+                    const badges = [
+                        document.getElementById('desktop-notification-badge'),
+                        document.getElementById('mobile-notification-badge'),
+                        document.getElementById('menu-notification-badge')
+                    ];
+                    
+                    badges.forEach(badge => {
+                        if (badge) {
+                            badge.textContent = data.count;
+                            badge.style.display = data.count > 0 ? 'inline-block' : 'none';
+                        }
+                    });
+                })
+                .catch(error => console.error('Bildirim sayısı alınamadı:', error));
+        }
+        
+        // Bildirim gösterme fonksiyonu
+        window.showNotification = showNotification;
+    </script>
+</body>
+</html>

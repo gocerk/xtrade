@@ -1,0 +1,182 @@
+[
+  {
+    "action": "sell",
+    "coin": "XRPUSDT",
+    "price": "2.1246",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "2.1363973868",
+      "macd": "-0.0008342149",
+      "macd_signal": "0.0012500027",
+      "rsi": "34.4898322425"
+    },
+    "timestamp": "2025-11-20T06:45:03.574Z"
+  },
+  {
+    "action": "sell",
+    "coin": "SOLUSDT",
+    "price": "142.97",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "143.6661669634",
+      "macd": "0.0013949434",
+      "macd_signal": "0.1393058615",
+      "rsi": "38.5291838962"
+    },
+    "timestamp": "2025-11-20T06:45:03.645Z"
+  },
+  {
+    "action": "sell",
+    "coin": "ENAUSDT",
+    "price": "0.2705",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "0.2717420487",
+      "macd": "0.0000291541",
+      "macd_signal": "0.0002561588",
+      "rsi": "39.5510955628"
+    },
+    "timestamp": "2025-11-20T06:45:04.571Z"
+  },
+  {
+    "action": "sell",
+    "coin": "SUIUSDT",
+    "price": "1.6252",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "1.6345548664",
+      "macd": "-0.0004552105",
+      "macd_signal": "0.0011011465",
+      "rsi": "35.232378731"
+    },
+    "timestamp": "2025-11-20T06:45:04.906Z"
+  },
+  {
+    "action": "sell",
+    "coin": "ARBUSDT",
+    "price": "0.2317",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "0.232953435",
+      "macd": "0.0001181585",
+      "macd_signal": "0.0003524303",
+      "rsi": "36.963129082"
+    },
+    "timestamp": "2025-11-20T06:45:06.189Z"
+  },
+  {
+    "action": "buy",
+    "coin": "ARBUSDT",
+    "price": "0.2336",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "0.232871168",
+      "macd": "0.0000642362",
+      "macd_signal": "0.0001225841",
+      "rsi": "58.8499555792"
+    },
+    "timestamp": "2025-11-20T07:10:16.002Z"
+  },
+  {
+    "action": "buy",
+    "coin": "DOGEUSDT",
+    "price": "0.15763",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "0.1573787745",
+      "macd": "-0.0000726164",
+      "macd_signal": "-0.0001077636",
+      "rsi": "55.2563711358"
+    },
+    "timestamp": "2025-11-20T07:30:05.347Z"
+  },
+  {
+    "action": "buy",
+    "coin": "SUIUSDT",
+    "price": "1.6369",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "1.631621509",
+      "macd": "-0.0006346213",
+      "macd_signal": "-0.0011646152",
+      "rsi": "57.5868957469"
+    },
+    "timestamp": "2025-11-20T07:35:01.439Z"
+  },
+  {
+    "action": "buy",
+    "coin": "ENAUSDT",
+    "price": "0.273",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "0.2716723771",
+      "macd": "0.000104107",
+      "macd_signal": "0.0000033326",
+      "rsi": "60.9045494161"
+    },
+    "timestamp": "2025-11-20T07:35:02.674Z"
+  },
+  {
+    "action": "buy",
+    "coin": "AVAXUSDT",
+    "price": "14.36",
+    "technicalIndicators": {
+      "ema": null,
+      "macd": null,
+      "macd_signal": null,
+      "rsi": null
+    },
+    "historical_prices": {
+      "ema": "14.3002342918",
+      "macd": "0.0023453547",
+      "macd_signal": "-0.0080994273",
+      "rsi": "63.6116873346"
+    },
+    "timestamp": "2025-11-20T07:35:09.886Z"
+  }
+]

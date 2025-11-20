@@ -1,0 +1,254 @@
+<div class="container-fluid">
+    <h1 class="h2 mb-4">Pozisyonlar</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <h5 class="card-title">Cüzdan Bakiyesi</h5>
+                            <h3 class="text-success mb-0"><%= locals.walletBalance || '0.00' %> USDT</h3>
+                        </div>
+                        
+                        <div class="col-md-3 text-center">
+                            <button id="refreshPositions" class="btn btn-primary">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Pozisyonları Yenile
+                            </button>
+                        </div>
+                        
+                        <div class="col-md-3 text-center">
+                            <button id="getPNL" class="btn btn-info text-white">
+                                <i class="bi bi-wallet2 me-1"></i> Kar/Zarar Bilgisi
+                            </button>
+                        </div>
+                        
+                        <div class="col-md-3 text-end">
+                            <button id="closeAllPositions" class="btn btn-danger">
+                                <i class="bi bi-x-circle me-1"></i> Tüm Pozisyonları Kapat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Açık Pozisyonlar</h5>
+        </div>
+        <div class="card-body">
+            <% if (locals.positions && positions.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Sembol</th>
+                                <th>Yön</th>
+                                <th>Miktar</th>
+                                <th>Giriş Fiyatı</th>
+                                <th>Güncel Fiyat</th>
+                                <th>Kaldıraç</th>
+                                <th>Marjin</th>
+                                <th>Kar/Zarar</th>
+                                <th>Kar/Zarar (%)</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% positions.forEach(position => { 
+                                const positionAmt = parseFloat(position.positionAmt);
+                                const entryPrice = parseFloat(position.entryPrice);
+                                const markPrice = parseFloat(position.markPrice);
+                                const leverage = parseFloat(position.leverage);
+                                const isolatedMargin = parseFloat(position.isolatedMargin);
+                                const unRealizedProfit = parseFloat(position.unRealizedProfit);
+                                const profitPercent = (markPrice - entryPrice) * 100 / entryPrice * (positionAmt > 0 ? 1 : -1) * leverage;
+                            %>
+                                <tr>
+                                    <td><%= position.symbol %></td>
+                                    <td>
+                                        <span class="badge <%= positionAmt > 0 ? 'bg-success' : 'bg-danger' %>">
+                                            <%= positionAmt > 0 ? 'LONG' : 'SHORT' %>
+                                        </span>
+                                    </td>
+                                    <td><%= Math.abs(positionAmt).toFixed(5) %></td>
+                                    <td><%= entryPrice.toFixed(4) %></td>
+                                    <td><%= markPrice.toFixed(4) %></td>
+                                    <td><%= leverage %>x</td>
+                                    <td><%= isolatedMargin.toFixed(2) %> USDT</td>
+                                    <td class="<%= unRealizedProfit >= 0 ? 'text-success' : 'text-danger' %>">
+                                        <%= unRealizedProfit.toFixed(2) %> USDT
+                                    </td>
+                                    <td class="<%= profitPercent >= 0 ? 'text-success' : 'text-danger' %>">
+                                        <%= profitPercent.toFixed(2) %>%
+                                    </td>
+                                    <td>
+                                        <form action="/positions/close" method="POST" style="display: inline;">
+                                            <input type="hidden" name="symbol" value="<%= position.symbol %>">
+                                            <input type="hidden" name="side" value="<%= positionAmt > 0 ? 'LONG' : 'SHORT' %>">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-x-circle me-1"></i> Kapat
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle me-2"></i> Aktif pozisyonunuz bulunmamaktadır.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="pnlModal" tabindex="-1" aria-labelledby="pnlModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pnlModalLabel">Kar/Zarar Bilgisi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status" id="pnlSpinner">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+                <div id="pnlContent" style="display: none;">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Cüzdan Bakiyesi</h6>
+                                    <h3 class="text-primary" id="walletBalance">0.00 USDT</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Kullanılabilir Bakiye</h6>
+                                    <h3 class="text-success" id="availableBalance">0.00 USDT</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Bugünkü Kar/Zarar</h6>
+                                    <h3 id="todayPNL">0.00 USDT</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Gerçekleşmemiş Kar/Zarar</h6>
+                                    <h3 id="unrealizedPNL">0.00 USDT</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pozisyonları yenile butonu
+    const refreshButton = document.getElementById('refreshPositions');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', function() {
+            window.location.reload();
+        });
+    }
+    
+    // Tüm pozisyonları kapat butonu
+    const closeAllButton = document.getElementById('closeAllPositions');
+    if (closeAllButton) {
+        closeAllButton.addEventListener('click', function() {
+            if (confirm('Tüm açık pozisyonlarınızı kapatmak istediğinizden emin misiniz?')) {
+                // Tüm pozisyonları kapatma işlemi
+                fetch('/positions/close-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Tüm pozisyonlar başarıyla kapatıldı', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        showNotification(data.error || 'Pozisyonlar kapatılırken bir hata oluştu', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Close all positions error:', error);
+                    showNotification('Pozisyonlar kapatılırken bir hata oluştu', 'error');
+                });
+            }
+        });
+    }
+    
+    // Kar/Zarar bilgisi butonu
+    const pnlButton = document.getElementById('getPNL');
+    if (pnlButton) {
+        const pnlModal = new bootstrap.Modal(document.getElementById('pnlModal'));
+        
+        pnlButton.addEventListener('click', function() {
+            // Modal'ı göster
+            pnlModal.show();
+            
+            // Spinner'ı göster, içeriği gizle
+            document.getElementById('pnlSpinner').style.display = 'block';
+            document.getElementById('pnlContent').style.display = 'none';
+            
+            // Bakiye bilgilerini al
+            fetch('/balance')
+                .then(response => response.json())
+                .then(data => {
+                    // Spinner'ı gizle, içeriği göster
+                    document.getElementById('pnlSpinner').style.display = 'none';
+                    document.getElementById('pnlContent').style.display = 'block';
+                    
+                    // Verileri doldur
+                    document.getElementById('walletBalance').textContent = `${data.walletBalance.toFixed(2)} USDT`;
+                    document.getElementById('availableBalance').textContent = `${data.availableBalance.toFixed(2)} USDT`;
+                    
+                    const todayPNL = document.getElementById('todayPNL');
+                    todayPNL.textContent = `${data.todayPNL.toFixed(2)} USDT`;
+                    todayPNL.classList.remove('text-success', 'text-danger');
+                    todayPNL.classList.add(data.todayPNL >= 0 ? 'text-success' : 'text-danger');
+                    
+                    const unrealizedPNL = document.getElementById('unrealizedPNL');
+                    unrealizedPNL.textContent = `${data.unrealizedPNL.toFixed(2)} USDT`;
+                    unrealizedPNL.classList.remove('text-success', 'text-danger');
+                    unrealizedPNL.classList.add(data.unrealizedPNL >= 0 ? 'text-success' : 'text-danger');
+                })
+                .catch(error => {
+                    console.error('Balance error:', error);
+                    document.getElementById('pnlSpinner').style.display = 'none';
+                    document.getElementById('pnlContent').style.display = 'block';
+                    showNotification('Bakiye bilgisi alınırken bir hata oluştu', 'error');
+                });
+        });
+    }
+});
+</script>

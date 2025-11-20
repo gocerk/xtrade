@@ -1,0 +1,136 @@
+<div class="container-fluid">
+    <h1 class="h2 mb-4">Kullanıcı Listesi</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Tüm Kullanıcılar</h5>
+                    <a href="/admin/create-user" class="btn btn-sm btn-primary">
+                        <i class="bi bi-person-plus me-1"></i> Yeni Kullanıcı
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Kullanıcı Adı</th>
+                                    <th>E-posta</th>
+                                    <th>Kayıt Tarihi</th>
+                                    <th>Son Giriş</th>
+                                    <th>Abonelik</th>
+                                    <th>API</th>
+                                    <th>Admin</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (locals.users && users.length > 0) { %>
+                                    <% users.forEach(user => { %>
+                                        <tr>
+                                            <td><%= user.id %></td>
+                                            <td><%= user.username %></td>
+                                            <td><%= user.email %></td>
+                                            <td><%= new Date(user.created_at).toLocaleDateString() %></td>
+                                            <td><%= user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Giriş Yapılmadı' %></td>
+                                            <td>
+                                                <% if (user.subscription_end && new Date(user.subscription_end) > new Date()) { %>
+                                                    <span class="badge bg-success">Aktif</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-danger">Pasif</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (user.has_api_keys) { %>
+                                                    <span class="badge bg-success">Var</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-danger">Yok</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (user.is_admin) { %>
+                                                    <span class="badge bg-primary">Admin</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-secondary">Kullanıcı</span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="8" class="text-center">Henüz kullanıcı yok</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Kullanıcı İstatistikleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Toplam Kullanıcı</h6>
+                        <h2 class="text-primary"><%= locals.users ? users.length : 0 %></h2>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Aktif Abonelikler</h6>
+                        <h2 class="text-success">
+                            <%= 
+                                locals.users 
+                                ? users.filter(u => u.subscription_end && new Date(u.subscription_end) > new Date()).length 
+                                : 0 
+                            %>
+                        </h2>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>API Tanımlı Kullanıcılar</h6>
+                        <h2 class="text-info">
+                            <%= 
+                                locals.users 
+                                ? users.filter(u => u.has_api_keys).length 
+                                : 0 
+                            %>
+                        </h2>
+                    </div>
+                    
+                    <div>
+                        <h6>Admin Kullanıcılar</h6>
+                        <h2 class="text-warning">
+                            <%= 
+                                locals.users 
+                                ? users.filter(u => u.is_admin).length 
+                                : 0 
+                            %>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Hızlı İşlemler</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/create-user" class="btn btn-primary mb-2 w-100">
+                        <i class="bi bi-person-plus me-1"></i> Yeni Kullanıcı Oluştur
+                    </a>
+                    <a href="/admin/create-key" class="btn btn-success mb-2 w-100">
+                        <i class="bi bi-key me-1"></i> Lisans Anahtarı Oluştur
+                    </a>
+                    <a href="/admin" class="btn btn-secondary w-100">
+                        <i class="bi bi-arrow-left me-1"></i> Admin Paneline Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,53 @@
+<div class="container">
+    <h1 class="h2 mb-4">Lisans Anahtarı Oluştur</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Yeni Lisans Anahtarı</h5>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/create-key" method="POST">
+                        <div class="mb-3">
+                            <label for="days" class="form-label">Geçerlilik Süresi (Gün)</label>
+                            <input type="number" class="form-control" id="days" name="days" min="1" value="30" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="count" class="form-label">Oluşturulacak Anahtar Sayısı</label>
+                            <input type="number" class="form-control" id="count" name="count" min="1" max="50" value="1" required>
+                            <div class="form-text">Bir seferde en fazla 50 anahtar oluşturabilirsiniz.</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Anahtarları Oluştur</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Bilgi</h5>
+                </div>
+                <div class="card-body">
+                    <p>Bu sayfa üzerinden yeni lisans anahtarları oluşturabilirsiniz.</p>
+                    <p>Oluşturulan anahtarlar, kullanıcılar tarafından aboneliklerini uzatmak için kullanılabilir.</p>
+                    <p>Oluşturulan tüm anahtarları görmek için <a href="/admin/license-keys">Lisans Anahtarları</a> sayfasını ziyaret edin.</p>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Son İşlemler</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/users" class="btn btn-outline-primary mb-2 w-100">Tüm Kullanıcılar</a>
+                    <a href="/admin/subscribers" class="btn btn-outline-success mb-2 w-100">Tüm Aboneler</a>
+                    <a href="/admin/license-keys" class="btn btn-outline-info mb-2 w-100">Tüm Lisans Anahtarları</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

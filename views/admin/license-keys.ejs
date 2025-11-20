@@ -1,0 +1,143 @@
+<div class="container-fluid">
+    <h1 class="h2 mb-4">Lisans Anahtarları</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Tüm Lisans Anahtarları</h5>
+                    <a href="/admin/create-key" class="btn btn-sm btn-primary">
+                        <i class="bi bi-key me-1"></i> Yeni Anahtar Oluştur
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Lisans Anahtarı</th>
+                                    <th>Süre (Gün)</th>
+                                    <th>Kullanım Durumu</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (locals.keys && keys.length > 0) { %>
+                                    <% keys.forEach(key => { %>
+                                        <tr>
+                                            <td><code><%= key.license_key %></code></td>
+                                            <td><%= key.time %></td>
+                                            <td>
+                                                <% if (key.used === '1' || key.used === 1) { %>
+                                                    <span class="badge bg-danger">Kullanıldı</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-success">Kullanılmadı</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary copy-key" data-key="<%= key.license_key %>">
+                                                    <i class="bi bi-clipboard me-1"></i> Kopyala
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="4" class="text-center">Henüz lisans anahtarı oluşturulmamış</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Anahtar İstatistikleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Toplam Anahtar</h6>
+                        <h2 class="text-primary"><%= locals.keys ? keys.length : 0 %></h2>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Kullanılmayan Anahtarlar</h6>
+                        <h2 class="text-success">
+                            <%= 
+                                locals.keys 
+                                ? keys.filter(k => k.used !== '1' && k.used !== 1).length 
+                                : 0 
+                            %>
+                        </h2>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Kullanılan Anahtarlar</h6>
+                        <h2 class="text-danger">
+                            <%= 
+                                locals.keys 
+                                ? keys.filter(k => k.used === '1' || k.used === 1).length 
+                                : 0 
+                            %>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Hızlı İşlemler</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/create-key" class="btn btn-success mb-2 w-100">
+                        <i class="bi bi-key me-1"></i> Yeni Anahtar Oluştur
+                    </a>
+                    <a href="/admin/subscribers" class="btn btn-info mb-2 w-100 text-white">
+                        <i class="bi bi-people me-1"></i> Aboneleri Görüntüle
+                    </a>
+                    <a href="/admin" class="btn btn-secondary w-100">
+                        <i class="bi bi-arrow-left me-1"></i> Admin Paneline Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Kopyala butonları için event listener
+    const copyButtons = document.querySelectorAll('.copy-key');
+    
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const key = this.getAttribute('data-key');
+            navigator.clipboard.writeText(key)
+                .then(() => {
+                    // Butonu güncelle
+                    const icon = this.querySelector('i');
+                    icon.className = 'bi bi-check-circle me-1';
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-success');
+                    this.innerHTML = '<i class="bi bi-check-circle me-1"></i> Kopyalandı';
+                    
+                    // 2 saniye sonra tekrar normal hale getir
+                    setTimeout(() => {
+                        icon.className = 'bi bi-clipboard me-1';
+                        this.classList.remove('btn-success');
+                        this.classList.add('btn-outline-primary');
+                        this.innerHTML = '<i class="bi bi-clipboard me-1"></i> Kopyala';
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Kopyalama hatası:', err);
+                    alert('Kopyalama sırasında bir hata oluştu.');
+                });
+        });
+    });
+});
+</script>

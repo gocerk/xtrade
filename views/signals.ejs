@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinyal İstatistikleri - TraderProBot</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Navbar ve sidebar eklenir -->
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+        <div class="container-fluid">
+            <h1 class="h2 mb-4">Sinyal İstatistikleri</h1>
+            
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Genel Başarı Oranları</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="text-center mb-4">
+                                        <h2 class="display-5 text-success fw-bold" id="success-rate">65%</h2>
+                                        <p class="text-muted">Ortalama başarı oranı</p>
+                                    </div>
+                                    
+                                    <div class="progress mb-3" style="height: 25px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" 
+                                            aria-valuenow="65" aria-valuemin="0" aria-valuemax="100" id="success-progress">65%</div>
+                                    </div>
+                                    
+                                    <p class="text-muted">Son 30 gün içinde paylaşılan sinyallerin ortalama başarı oranı.</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3" style="width: 100px;">Son 7 gün:</div>
+                                        <div class="progress flex-grow-1" style="height: 20px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 68%;" 
+                                                id="7days-progress">68%</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3" style="width: 100px;">Son 14 gün:</div>
+                                        <div class="progress flex-grow-1" style="height: 20px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 64%;" 
+                                                id="14days-progress">64%</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3" style="width: 100px;">Son 30 gün:</div>
+                                        <div class="progress flex-grow-1" style="height: 20px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 66%;" 
+                                                id="30days-progress">66%</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3" style="width: 100px;">Tüm zamanlar:</div>
+                                        <div class="progress flex-grow-1" style="height: 20px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 63%;" 
+                                                id="alltime-progress">63%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Performans Grafiği</h5>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <canvas id="performanceChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Parite Başarı Oranları</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Parite</th>
+                                            <th>Sinyal Sayısı</th>
+                                            <th>Başarılı</th>
+                                            <th>Başarısız</th>
+                                            <th>Başarı Oranı</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pairTable">
+                                        <tr>
+                                            <td>BTC/USDT</td>
+                                            <td>42</td>
+                                            <td>28</td>
+                                            <td>14</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: 67%;"></div>
+                                                    </div>
+                                                    <span>67%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ETH/USDT</td>
+                                            <td>35</td>
+                                            <td>23</td>
+                                            <td>12</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: 66%;"></div>
+                                                    </div>
+                                                    <span>66%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>SOL/USDT</td>
+                                            <td>28</td>
+                                            <td>19</td>
+                                            <td>9</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: 68%;"></div>
+                                                    </div>
+                                                    <span>68%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>BNB/USDT</td>
+                                            <td>25</td>
+                                            <td>16</td>
+                                            <td>9</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: 64%;"></div>
+                                                    </div>
+                                                    <span>64%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>XRP/USDT</td>
+                                            <td>22</td>
+                                            <td>14</td>
+                                            <td>8</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: 64%;"></div>
+                                                    </div>
+                                                    <span>64%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Sinyal Özeti</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded mb-3">
+                                <div>Toplam Sinyal Sayısı</div>
+                                <div class="fw-bold fs-5" id="total-signals">152</div>
+                            </div>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <div class="p-3 border border-success rounded text-center">
+                                        <h3 class="text-success mb-0" id="successful-signals">98</h3>
+                                        <small class="text-muted">Başarılı Sinyal</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-3 border border-danger rounded text-center">
+                                        <h3 class="text-danger mb-0" id="failed-signals">54</h3>
+                                        <small class="text-muted">Başarısız Sinyal</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card bg-light mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Son 7 Günün En İyi Sinyalleri</h5>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                                            <div>
+                                                <span class="badge bg-success me-2">UZUN</span>
+                                                <span>BTC/USDT</span>
+                                            </div>
+                                            <span class="badge bg-success rounded-pill">+12.5%</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                                            <div>
+                                                <span class="badge bg-danger me-2">KISA</span>
+                                                <span>SOL/USDT</span>
+                                            </div>
+                                            <span class="badge bg-success rounded-pill">+8.7%</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                                            <div>
+                                                <span class="badge bg-success me-2">UZUN</span>
+                                                <span>ETH/USDT</span>
+                                            </div>
+                                            <span class="badge bg-success rounded-pill">+7.3%</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">Risk Uyarısı</h5>
+                                    <p>Geçmiş performans, gelecekteki sonuçların garantisi değildir. Kripto para piyasaları yüksek risk içerir ve fiyatlar hızla değişebilir.</p>
+                                    <p class="mb-0">Her zaman kendi araştırmanızı yapın ve kaybetmeyi göze alabileceğiniz miktarla işlem yapın.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Rastgele başarı oranı değişimi için fonksiyon (60-70% arasında)
+            function generateRandomSuccessRate() {
+                return Math.floor(Math.random() * 11) + 60;  // 60-70 arası
+            }
+            
+            // Başlangıç değerlerini ayarla
+            updateStatistics();
+            
+            // Performans grafiğini çiz
+            createPerformanceChart();
+            
+            // Her 30 saniyede bir istatistikleri güncelle
+            setInterval(updateStatistics, 30000);
+            
+            function updateStatistics() {
+                // Ana başarı oranı
+                const successRate = generateRandomSuccessRate();
+                document.getElementById('success-rate').textContent = successRate + '%';
+                document.getElementById('success-progress').style.width = successRate + '%';
+                document.getElementById('success-progress').textContent = successRate + '%';
+                
+                // Dönem bazlı oranlar
+                const days7Rate = generateRandomSuccessRate();
+                const days14Rate = generateRandomSuccessRate();
+                const days30Rate = generateRandomSuccessRate();
+                const alltimeRate = generateRandomSuccessRate();
+                
+                document.getElementById('7days-progress').style.width = days7Rate + '%';
+                document.getElementById('7days-progress').textContent = days7Rate + '%';
+                
+                document.getElementById('14days-progress').style.width = days14Rate + '%';
+                document.getElementById('14days-progress').textContent = days14Rate + '%';
+                
+                document.getElementById('30days-progress').style.width = days30Rate + '%';
+                document.getElementById('30days-progress').textContent = days30Rate + '%';
+                
+                document.getElementById('alltime-progress').style.width = alltimeRate + '%';
+                document.getElementById('alltime-progress').textContent = alltimeRate + '%';
+                
+                // Sinyal sayıları
+                const totalSignals = 152;
+                const successfulSignals = Math.round(totalSignals * successRate / 100);
+                const failedSignals = totalSignals - successfulSignals;
+                
+                document.getElementById('total-signals').textContent = totalSignals;
+                document.getElementById('successful-signals').textContent = successfulSignals;
+                document.getElementById('failed-signals').textContent = failedSignals;
+                
+                // Parite tablosunu güncelle
+                updatePairTable();
+            }
+            
+            function updatePairTable() {
+                const pairs = [
+                    { name: 'BTC/USDT', total: 42 },
+                    { name: 'ETH/USDT', total: 35 },
+                    { name: 'SOL/USDT', total: 28 },
+                    { name: 'BNB/USDT', total: 25 },
+                    { name: 'XRP/USDT', total: 22 }
+                ];
+                
+                let tableHtml = '';
+                
+                pairs.forEach(pair => {
+                    const successRate = generateRandomSuccessRate();
+                    const successful = Math.round(pair.total * successRate / 100);
+                    const failed = pair.total - successful;
+                    
+                    tableHtml += `
+                        <tr>
+                            <td>${pair.name}</td>
+                            <td>${pair.total}</td>
+                            <td>${successful}</td>
+                            <td>${failed}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: ${successRate}%;"></div>
+                                    </div>
+                                    <span>${successRate}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                document.getElementById('pairTable').innerHTML = tableHtml;
+            }
+            
+            function createPerformanceChart() {
+                // Son 30 günlük veri
+                const labels = Array.from({length: 30}, (_, i) => `Gün ${i+1}`);
+                
+                // 60-70 arasında rastgele başarı oranları
+                const successRates = Array.from({length: 30}, () => generateRandomSuccessRate());
+                
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Günlük Başarı Oranı (%)',
+                            data: successRates,
+                            fill: true,
+                            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointBackgroundColor: 'rgba(40, 167, 69, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Başarı Oranı: ${context.raw}%`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                min: 50,
+                                max: 80,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Her 1 dakikada bir grafiği güncelle
+                setInterval(() => {
+                    // En eski veriyi kaldır ve yeni bir veri ekle
+                    successRates.shift();
+                    successRates.push(generateRandomSuccessRate());
+                    
+                    chart.data.datasets[0].data = successRates;
+                    chart.update();
+                }, 60000);
+            }
+        });
+    </script>
+</body>
+</html>

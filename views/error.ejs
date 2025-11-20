@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Hata' %> - TraderProBot</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="text-center">
+            <h1 class="display-1 fw-bold text-danger">Hata</h1>
+            <p class="fs-3"><span class="text-danger">Oops!</span> Bir sorun oluştu.</p>
+            <p class="lead">
+                <%= message || 'Bir hata oluştu.' %>
+            </p>
+            <p class="text-muted">
+                <% if (status) { %>
+                    Hata Kodu: <%= status %>
+                <% } %>
+            </p>
+            <a href="/" class="btn btn-primary">Ana Sayfaya Dön</a>
+        </div>
+    </div>
+</body>
+</html>

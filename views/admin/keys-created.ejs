@@ -1,0 +1,87 @@
+<div class="container">
+    <h1 class="h2 mb-4">Oluşturulan Lisans Anahtarları</h1>
+
+    <div class="alert alert-success mb-4">
+        <h5><i class="bi bi-check-circle me-2"></i> Başarılı!</h5>
+        <p class="mb-0"><%= keys.length %> adet lisans anahtarı başarıyla oluşturuldu.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Lisans Anahtarları</h5>
+            <a href="/admin/create-key" class="btn btn-sm btn-primary">Yeni Anahtar Oluştur</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Lisans Anahtarı</th>
+                            <th>Süre (Gün)</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% keys.forEach((key, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td><code><%= key.key %></code></td>
+                                <td><%= key.days %></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary copy-key" data-key="<%= key.key %>">
+                                        <i class="bi bi-clipboard me-1"></i> Kopyala
+                                    </button>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="/admin/license-keys" class="btn btn-outline-secondary">
+                    <i class="bi bi-list me-1"></i> Tüm Lisans Anahtarları
+                </a>
+                <a href="/admin" class="btn btn-primary">
+                    <i class="bi bi-arrow-left me-1"></i> Admin Paneline Dön
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Kopyala butonları için event listener
+    const copyButtons = document.querySelectorAll('.copy-key');
+    
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const key = this.getAttribute('data-key');
+            navigator.clipboard.writeText(key)
+                .then(() => {
+                    // Butonu güncelle
+                    const icon = this.querySelector('i');
+                    icon.className = 'bi bi-check-circle me-1';
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-success');
+                    this.innerHTML = '<i class="bi bi-check-circle me-1"></i> Kopyalandı';
+                    
+                    // 2 saniye sonra tekrar normal hale getir
+                    setTimeout(() => {
+                        icon.className = 'bi bi-clipboard me-1';
+                        this.classList.remove('btn-success');
+                        this.classList.add('btn-outline-primary');
+                        this.innerHTML = '<i class="bi bi-clipboard me-1"></i> Kopyala';
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Kopyalama hatası:', err);
+                    alert('Kopyalama sırasında bir hata oluştu.');
+                });
+        });
+    });
+});
+</script>

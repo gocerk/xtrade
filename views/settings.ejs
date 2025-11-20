@@ -1,0 +1,163 @@
+<div class="container-fluid">
+    <h1 class="h2 mb-4">İşlem Ayarları</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">İşlem Parametreleri</h5>
+                </div>
+                <div class="card-body">
+                    <form action="/settings" method="POST" class="needs-validation" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="amount_per_trade" class="form-label">İşlem Başına USDT Miktarı</label>
+                                <input type="number" class="form-control" id="amount_per_trade" name="amount_per_trade" step="0.01" min="1" 
+                                       value="<%= locals.settings && settings.amount_per_trade || '100' %>" required>
+                                <div class="form-text">Her işlem için kullanılacak USDT miktarını girin.</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="leverage" class="form-label">Kaldıraç (1-125)</label>
+                                <input type="number" class="form-control" id="leverage" name="leverage" min="1" max="125" 
+                                       value="<%= locals.settings && settings.leverage || '10' %>" required>
+                                <div class="form-text">İşlemleriniz için kaldıraç oranını girin.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="profit_percent_1" class="form-label">1. Kâr Alma Yüzdesi</label>
+                                <input type="number" class="form-control" id="profit_percent_1" name="profit_percent_1" step="0.01" min="0.1" 
+                                       value="<%= locals.settings && settings.profit_percent_1 || '1.5' %>" required>
+                                <div class="form-text">İlk kâr alma noktası için yüzde değeri.</div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="profit_percent_2" class="form-label">2. Kâr Alma Yüzdesi</label>
+                                <input type="number" class="form-control" id="profit_percent_2" name="profit_percent_2" step="0.01" min="0" 
+                                       value="<%= locals.settings && settings.profit_percent_2 || '3' %>">
+                                <div class="form-text">İkinci kâr alma noktası için yüzde değeri. Kullanmak istemiyorsanız 0 girin.</div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="stop_loss_percent" class="form-label">Zarar Kesme Yüzdesi</label>
+                                <input type="number" class="form-control" id="stop_loss_percent" name="stop_loss_percent" step="0.01" min="0.1" 
+                                       value="<%= locals.settings && settings.stop_loss_percent || '1' %>" required>
+                                <div class="form-text">Zarar kesme noktası için yüzde değeri.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="margin_type" class="form-label">Marjin Tipi</label>
+                            <select class="form-select" id="margin_type" name="margin_type">
+                                <option value="isolated" <%= locals.settings && settings.margin_type === 'isolated' ? 'selected' : '' %>>İzole Marjin</option>
+                                <option value="crossed" <%= locals.settings && settings.margin_type === 'crossed' ? 'selected' : '' %>>Çapraz Marjin</option>
+                            </select>
+                            <div class="form-text">İşlemleriniz için marjin tipini seçin.</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Ayarları Kaydet</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Hesaplanmış Değerler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Kaldıraçlı Miktar</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="leveraged_amount_display" value="<%= locals.settings && settings.leveraged_amount || '0.00' %> USDT" readonly>
+                            <span class="input-group-text">USDT</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Gerçek Stop-Loss</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="adjusted_stop_loss_display" value="<%= locals.settings && settings.adjusted_stop_loss || '0.0000' %>" readonly>
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Gerçek 1. TP</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="adjusted_take_profit_1_display" value="<%= locals.settings && settings.adjusted_take_profit_1 || '0.0000' %>" readonly>
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Gerçek 2. TP</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="adjusted_take_profit_2_display" value="<%= locals.settings && settings.adjusted_take_profit_2 || '0.0000' %>" readonly>
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Kaldıraç kullanırken, gerçek kar/zarar yüzdeleri kaldıraç oranına göre hesaplanır. Yüksek kaldıraç kullanırken düşük stop-loss ayarlamayı unutmayın.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+    
+    // Hesaplama fonksiyonu
+    function calculateValues() {
+        const amount = parseFloat(document.getElementById('amount_per_trade').value || 0);
+        const leverage = parseFloat(document.getElementById('leverage').value || 0);
+        const stopLoss = parseFloat(document.getElementById('stop_loss_percent').value || 0);
+        const profit1 = parseFloat(document.getElementById('profit_percent_1').value || 0);
+        const profit2 = parseFloat(document.getElementById('profit_percent_2').value || 0);
+        
+        if (amount <= 0 || leverage <= 0 || stopLoss <= 0) {
+            return;
+        }
+        
+        // Hesaplamalar
+        const leveragedAmount = amount * leverage;
+        const adjustedStopLoss = stopLoss / leverage;
+        const adjustedTakeProfit1 = profit1 / leverage;
+        const adjustedTakeProfit2 = profit2 > 0 ? profit2 / leverage : 0;
+        
+        // Sonuçları DOM'a yaz
+        document.getElementById('leveraged_amount_display').value = leveragedAmount.toFixed(2) + ' USDT';
+        document.getElementById('adjusted_stop_loss_display').value = adjustedStopLoss.toFixed(4);
+        document.getElementById('adjusted_take_profit_1_display').value = adjustedTakeProfit1.toFixed(4);
+        document.getElementById('adjusted_take_profit_2_display').value = adjustedTakeProfit2.toFixed(4);
+    }
+    
+    // Input değişikliklerini dinle
+    document.getElementById('amount_per_trade').addEventListener('input', calculateValues);
+    document.getElementById('leverage').addEventListener('input', calculateValues);
+    document.getElementById('stop_loss_percent').addEventListener('input', calculateValues);
+    document.getElementById('profit_percent_1').addEventListener('input', calculateValues);
+    document.getElementById('profit_percent_2').addEventListener('input', calculateValues);
+    
+    // Sayfa yüklendiğinde bir kez hesapla
+    calculateValues();
+});
+</script>

@@ -34,7 +34,8 @@ async function getLicenseKey(key) {
 
 async function addDayToUser(daysToAdd, userId) {
   try {
-    const results = await dbQuery('SELECT time FROM bultende_olanlar WHERE user_id = ?', [userId]);
+    const resultsRaw = await dbQuery('SELECT time FROM bultende_olanlar WHERE user_id = ?', [userId]);
+    const results = Array.isArray(resultsRaw) ? resultsRaw : [];
     
     let newEndTime;
     let sql;
@@ -112,7 +113,8 @@ function formatDisplayDate(date) {
 async function checkIsUserSubscriber(userId) {
   try {
     // Veritabanında bultende_olanlar tablosunda user_id ile eşleşen kayıt ara
-    const result = await dbQuery('SELECT time FROM bultende_olanlar WHERE user_id = ?', [userId]);
+    const resultRaw = await dbQuery('SELECT time FROM bultende_olanlar WHERE user_id = ?', [userId]);
+    const result = Array.isArray(resultRaw) ? resultRaw : [];
     
     // Sonuç yoksa, kullanıcı abone değil
     if (result.length === 0) {

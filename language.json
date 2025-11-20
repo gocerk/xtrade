@@ -136,6 +136,7 @@
   "buyLicenseMessage": "🛒 Mesaj atarak lisans anahtarı satın alabilirsiniz.\n\n@Alexa_Destek",
   "supportMessage": "📞 Şikayet, öneri ve istekleriniz için @Alexa_Destek ile iletişime geçebilirsiniz.",
   "imageToSubscribersPrompt": "Lütfen abonelere göndermek istediğiniz resmi gönderin. Resim göndermek istemiyorsanız, 'Atla' yazın.",
+  "keyAlreadyUsed": "❌ Anahtar zaten kullanılmış!",
   "keyNotFound": "❌ Anahtar hatalı veya bulunamadı!",
   "errorUpdatingLeveragedValues": "Kaldıraçlı değerler güncellenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin veya yönetici ile iletişime geçin.",
   "subscriptionExpired": "Aboneliğiniz bitti. Lütfen tekrar satın almak için /start komutunu kullanın.",

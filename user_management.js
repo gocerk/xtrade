@@ -34,7 +34,12 @@ async function getLicenseKey(key) {
 
 async function addDayToUser(daysToAdd, userId) {
   try {
-    const resultsRaw = await dbQuery('SELECT time FROM bultende_olanlar WHERE user_id = ?', [userId]);
+    // normalize userId to string to avoid JS number precision/overflow issues
+    const userIdParam = (typeof userId === 'bigint') ? userId.toString() : String(userId);
+    if (!/^-?\d+$/.test(userIdParam)) {
+      throw new Error('Invalid userId');
+    }
+    const resultsRaw = await dbQuery('SELECT time FROM bultende_olanlar WHERE user_id = ?', [userIdParam]);
     const results = Array.isArray(resultsRaw) ? resultsRaw : [];
     
     let newEndTime;
@@ -60,7 +65,7 @@ async function addDayToUser(daysToAdd, userId) {
         const formattedDate = formatMySQLDate(newEndTime);
         
         sql = 'UPDATE bultende_olanlar SET time = ? WHERE user_id = ? AND time = ?';
-        queryParams = [formattedDate, userId, formatMySQLDate(currentEndDate)];
+        queryParams = [formattedDate, userIdParam, formatMySQLDate(currentEndDate)];
       } else {
         // Abonelik sona ermişse, yeni bir abonelik oluştur
         newEndTime = new Date();
@@ -70,7 +75,7 @@ async function addDayToUser(daysToAdd, userId) {
         const formattedDate = formatMySQLDate(newEndTime);
         
         sql = 'INSERT INTO bultende_olanlar (user_id, time) VALUES (?, ?)';
-        queryParams = [userId, formattedDate];
+        queryParams = [userIdParam, formattedDate];
       }
     } else {
       // Hiç abonelik yoksa, yeni bir abonelik oluştur
@@ -81,7 +86,7 @@ async function addDayToUser(daysToAdd, userId) {
       const formattedDate = formatMySQLDate(newEndTime);
       
       sql = 'INSERT INTO bultende_olanlar (user_id, time) VALUES (?, ?)';
-      queryParams = [userId, formattedDate];
+      queryParams = [userIdParam, formattedDate];
     }
 
     await dbQuery(sql, queryParams);
@@ -112,8 +117,11 @@ function formatDisplayDate(date) {
 // checkIsUserSubscriber fonksiyonu - kullanıcının aktif aboneliği varmı kontrol et
 async function checkIsUserSubscriber(userId) {
   try {
-    // Veritabanında bultende_olanlar tablosunda user_id ile eşleşen kayıt ara
-    const resultRaw = await dbQuery('SELECT time FROM bultende_olanlar WHERE user_id = ?', [userId]);
+    const userIdParam = (typeof userId === 'bigint') ? userId.toString() : String(userId);
+    if (!/^-?\d+$/.test(userIdParam)) {
+      return { isSubscriber: false, endTime: null };
+    }
+    const resultRaw = await dbQuery('SELECT time FROM bultende_olanlar WHERE user_id = ?', [userIdParam]);
     const result = Array.isArray(resultRaw) ? resultRaw : [];
     
     // Sonuç yoksa, kullanıcı abone değil
